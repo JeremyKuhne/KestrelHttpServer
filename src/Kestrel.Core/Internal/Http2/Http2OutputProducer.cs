@@ -74,8 +74,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http2
             }
         }
 
-        // Review: This is called when a CancellationToken fires mid-write. In HTTP/1.x, this aborts the entire connection.
-        // Should we do that here?
+        // TODO: Send stream RST https://github.com/aspnet/KestrelHttpServer/issues/3007 
         void IHttpOutputAborter.Abort(ConnectionAbortedException abortReason)
         {
             Dispose();
