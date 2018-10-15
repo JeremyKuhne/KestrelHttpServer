@@ -20,7 +20,7 @@ namespace Kestrel.Interop.TestSites
                 .UseKestrel(options =>
                     options.ListenAnyIP(0, listenOptions =>
                     {
-                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                        listenOptions.Protocols = HttpProtocols.Http2;
                         listenOptions.UseHttps();
                     }))
                 .Configure(app =>

@@ -5,19 +5,23 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Server.IntegrationTesting;
 using Microsoft.AspNetCore.Testing.xunit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using Xunit;
+using static System.Environment;
 
 namespace Microsoft.AspNetCore.Server.Kestrel.Interop.FunctionalTests
 {
+    [OSSkipCondition(OperatingSystems.MacOSX, SkipReason = "Missing SslStream ALPN support: https://github.com/dotnet/corefx/issues/30492")]
+    [MinimumOSVersion(OperatingSystems.Windows, WindowsVersions.Win81,
+        SkipReason = "Missing Windows ALPN support: https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation#Support")]
     public class ChromeTests : LoggedTest
     {
-
-        private static readonly string _chromeExecutablePath = Path.Combine("c:\\", "Program Files (x86)", "Google", "Chrome", "Application", "chrome.exe");
+        private static readonly string _chromeExecutablePath = ResolveChromeExecutablePath();
         private static readonly string _chromeArgs = "--headless --disable-gpu --allow-insecure-localhost --enable-logging --dump-dom --virtual-time-budget=10000";
 
         [ConditionalTheory]
@@ -59,7 +63,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Interop.FunctionalTests
             }
         }
 
-
         private static string GetSolutionDir()
         {
             for (var dir = new DirectoryInfo(Directory.GetCurrentDirectory()); dir != null; dir = dir.Parent)
@@ -73,5 +76,18 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Interop.FunctionalTests
             throw new InvalidOperationException("Cannot find solution.");
         }
 
+        private static string ResolveChromeExecutablePath()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return Path.Combine(Environment.GetFolderPath(SpecialFolder.ProgramFilesX86), "Google", "Chrome", "Application", "chrome.exe");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return Path.Combine(Environment.GetFolderPath(SpecialFolder.ProgramFilesX86), "Google", "Chrome", "Application", "chrome.exe");
+            }
+
+            throw new PlatformNotSupportedException();
+        }
     }
 }
