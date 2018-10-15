@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Interop.FunctionalTests
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                return Path.Combine(Environment.GetFolderPath(SpecialFolder.ProgramFilesX86), "Google", "Chrome", "Application", "chrome.exe");
+                return Path.Combine("/usr", "bin", "google-chrome");
             }
 
             throw new PlatformNotSupportedException();
